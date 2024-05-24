@@ -15,21 +15,21 @@ type MetadataRepository interface {
 	Get(ctx context.Context, id string) (*model.Metadata, error)
 }
 
-//Controller defines a metadata service controller
-type Controller struct{
-    repo MetadataRepository
+// Controller defines a metadata service controller
+type Controller struct {
+	repo MetadataRepository
 }
 
-//New creates a metadata service controller
-func New(repo MetadataRepository) *Controller{
-    return &Controller{repo}
+// New creates a metadata service controller
+func New(repo MetadataRepository) *Controller {
+	return &Controller{repo}
 }
 
-//Get returns movie metadata by id
-func (c *Controller) Get(ctx context.Context, id string) (*model.Metadata, error){
-    res, err := c.repo.Get(ctx,id)
-    if err != nil && errors.Is(err, repository.ErrNotFound){
-        return nil, ErrNotFound
-    }
-    return res, nil
+// Get returns movie metadata by id
+func (c *Controller) Get(ctx context.Context, id string) (*model.Metadata, error) {
+	res, err := c.repo.Get(ctx, id)
+	if err != nil && errors.Is(err, repository.ErrNotFound) {
+		return nil, ErrNotFound
+	}
+	return res, nil
 }
