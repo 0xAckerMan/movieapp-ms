@@ -9,7 +9,6 @@ import (
 )
 
 // ErrNotFound is returned when the requested record is not found
-var ErrNotFound = errors.New("not found")
 
 type MetadataRepository interface {
 	Get(ctx context.Context, id string) (*model.Metadata, error)
@@ -29,7 +28,7 @@ func New(repo MetadataRepository) *Controller {
 func (c *Controller) Get(ctx context.Context, id string) (*model.Metadata, error) {
 	res, err := c.repo.Get(ctx, id)
 	if err != nil && errors.Is(err, repository.ErrNotFound) {
-		return nil, ErrNotFound
+		return nil, repository.ErrNotFound
 	}
 	return res, nil
 }
