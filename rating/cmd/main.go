@@ -5,14 +5,16 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
+	"net"
 	"time"
 
 	"github.com/0xAckerMan/movieapp-ms/pkg/discovery"
 	"github.com/0xAckerMan/movieapp-ms/pkg/discovery/consul"
 	"github.com/0xAckerMan/movieapp-ms/rating/internal/controller/rating"
-	httphandler "github.com/0xAckerMan/movieapp-ms/rating/internal/handler/http"
+	grpchandler "github.com/0xAckerMan/movieapp-ms/rating/internal/handler/grpc"
 	"github.com/0xAckerMan/movieapp-ms/rating/internal/repository/memory"
+	"github.com/0xAckerMan/movieapp-ms/src/gen"
+	"google.golang.org/grpc"
 )
 const serviceName = "rating"
 
@@ -43,9 +45,12 @@ func main() {
 
 	repo := memory.New()
 	ctrl := rating.New(repo)
-	h := httphandler.New(ctrl)
-	http.Handle("/rating", http.HandlerFunc(h.Handler))
-	if err := http.ListenAndServe(":8082", nil); err != nil {
-		panic(err)
-	}
+	h := grpchandler.New(ctrl)
+    lis, err := net.Listen("tcp", "localhost:8082")
+    if err != nil{
+        log.Fatalf("Failed to listen: %v", err)
+    }
+    srv := grpc.NewServer()
+    gen.RegisterRatingServiceServer(srv,h)
+    srv.Serve(lis)
 }
