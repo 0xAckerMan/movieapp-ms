@@ -5,14 +5,16 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
+	"net"
 	"time"
 
 	"github.com/0xAckerMan/movieapp-ms/metadata/internal/controller/metadata"
-	httphandler "github.com/0xAckerMan/movieapp-ms/metadata/internal/handler/http"
+	grpchandler "github.com/0xAckerMan/movieapp-ms/metadata/internal/handler/grpc"
 	"github.com/0xAckerMan/movieapp-ms/metadata/internal/repository/memory"
 	"github.com/0xAckerMan/movieapp-ms/pkg/discovery"
 	"github.com/0xAckerMan/movieapp-ms/pkg/discovery/consul"
+	"github.com/0xAckerMan/movieapp-ms/src/gen"
+	"google.golang.org/grpc"
 )
 
 const serviceName = "metadata"
@@ -47,9 +49,12 @@ func main() {
 
 	repo := memory.New()
 	ctrl := metadata.New(repo)
-	h := httphandler.New(ctrl)
-	http.Handle("/metadata", http.HandlerFunc(h.GetMetadata))
-	if err := http.ListenAndServe(":8081", nil); err != nil {
-		panic(err)
-	}
+	h := grpchandler.New(ctrl)
+    lis, err := net.Listen("tcp", "localhost:8081")
+    if err != nil{
+        log.Fatalf("Failed to listed: %v",err)
+    }
+    srv := grpc.NewServer()
+    gen.RegisterMetadataServiceServer(srv,h)
+    srv.Serve(lis)
 }
