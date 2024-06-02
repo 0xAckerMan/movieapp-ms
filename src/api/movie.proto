@@ -40,7 +40,7 @@ service RatingService {
 
 message GetAggregatedRatingRequest {
     string record_id = 1;
-    int32 record_type = 2;
+    string record_type = 2;
 }
 
 message GetAggregatedRatingResponse {
@@ -50,9 +50,21 @@ message GetAggregatedRatingResponse {
 message PutRatingRequest {
     string user_id = 1;
     string record_id = 2;
-    int32 record_type = 3;
+    string record_type = 3;
     int32 rating_value = 4;
 }
 
 message PutRatingResponse{
+}
+
+service MovieService {
+    rpc GetMovieDetails(GetMovieDetailsRequest) returns (GetMovieDetailsResponse);
+}
+
+message GetMovieDetailsRequest {
+    string movie_id = 1;
+}
+
+message GetMovieDetailsResponse {
+    MovieDetails movie_details = 1;
 }

@@ -50,7 +50,7 @@ func main() {
 	repo := memory.New()
 	ctrl := metadata.New(repo)
 	h := grpchandler.New(ctrl)
-    lis, err := net.Listen("tcp", "localhost:8081")
+    lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d",port))
     if err != nil{
         log.Fatalf("Failed to listed: %v",err)
     }
